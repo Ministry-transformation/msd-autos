@@ -16,12 +16,21 @@ import SiteLayout from '../layouts/SiteLayout.astro';
   const today = new Date();
   const localToday = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
   if (startField) startField.min = localToday;
-  startField?.addEventListener('change', () => { if (!endField) return; endField.min = startField.value || localToday; if (endField.value && endField.value < endField.min) endField.value = ''; });
+  const nextDay = (value: string) => {
+    const date = new Date(`${value}T00:00:00`);
+    date.setDate(date.getDate() + 1);
+    return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  };
+  startField?.addEventListener('change', () => {
+    if (!endField) return;
+    endField.min = startField.value ? nextDay(startField.value) : localToday;
+    if (endField.value && endField.value <= startField.value) endField.value = '';
+  });
   planner?.addEventListener('submit', event => {
     event.preventDefault();
     const start = (document.querySelector<HTMLInputElement>('#rental-start')?.value ?? '').trim();
     const end = (document.querySelector<HTMLInputElement>('#rental-end')?.value ?? '').trim();
-    if (start && end && end < start) { const messages = {en:'End date must be after the start date.',es:'La fecha de fin debe ser posterior a la fecha de inicio.',ru:'Дата окончания должна быть позже даты начала.'}; endField?.setCustomValidity(messages[document.documentElement.lang] ?? messages.en); endField?.reportValidity(); endField?.addEventListener('input', () => endField.setCustomValidity(''), { once: true }); return; }
+    if (start && end && end <= start) { const messages = {en:'End date must be after the start date.',es:'La fecha de fin debe ser posterior a la fecha de inicio.',ru:'Дата окончания должна быть позже даты начала.'}; endField?.setCustomValidity(messages[document.documentElement.lang] ?? messages.en); endField?.reportValidity(); endField?.addEventListener('input', () => endField.setCustomValidity(''), { once: true }); return; }
     const type = document.querySelector<HTMLSelectElement>('#rental-type')?.selectedOptions[0]?.textContent?.trim() ?? '';
     const notes = document.querySelector<HTMLTextAreaElement>('#rental-notes')?.value.trim() ?? '';
     if (result) {
@@ -39,4 +48,3 @@ import SiteLayout from '../layouts/SiteLayout.astro';
     }
   });
 </script>
-

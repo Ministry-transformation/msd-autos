@@ -1,4 +1,6 @@
-# MSD Autos website`r`n`r`nMultilingual automotive website demo for vehicle sales, rental enquiries and service in Torrevieja.
+# MSD Autos website
+
+Multilingual automotive website demo for vehicle sales, rental enquiries and service in Torrevieja.
 
 Standalone Astro site based on the MSD Autos design-system package.
 

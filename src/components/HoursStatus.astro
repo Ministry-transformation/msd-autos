@@ -1,8 +1,18 @@
 ---
 import Icon from './Icon.astro';
-const { label = 'Opening hours', status = 'To be confirmed with the team' } = Astro.props;
+const { label = 'Opening hours', status = 'To be confirmed with the team', workshop = false } = Astro.props;
 ---
-<div class="hours-status">
+<div class:list={['hours-status', workshop && 'hours-status--schedule']}>
   <Icon name="calendar" size={18} />
-  <div><span>{label}</span><strong>{status}</strong></div>
+  <div class="hours-status__content">
+    <span>{workshop ? 'Workshop opening hours' : label}</span>
+    {workshop ? <>
+      <div class="hours-schedule" aria-label="Workshop weekly schedule">
+        <div><span>Monday–Friday</span><strong>09:00–14:00 · 16:00–19:00</strong></div>
+        <div><span>Saturday</span><strong>09:30–14:00</strong></div>
+        <div><span>Sunday</span><strong>Closed</strong></div>
+      </div>
+      <small>Public directory listing · call to confirm before travelling.</small>
+    </> : <strong>{status}</strong>}
+  </div>
 </div>

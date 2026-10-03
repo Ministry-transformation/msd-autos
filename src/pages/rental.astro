@@ -1,0 +1,42 @@
+---
+import { sitePath } from '../utils/site-path';
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+<SiteLayout title="Rental | MSD Autos" description="Contact MSD Autos with a vehicle rental enquiry." active="/rental/">
+  <section class="page-hero page-hero--dark page-hero--rental"><div class="wrap"><p class="breadcrumbs"><a href={sitePath('/')}>Home</a> / Rental</p><p class="eyebrow">MSD Autos rental</p><h1>Rental enquiries.</h1><p class="lead">Contact MSD Autos to ask about rental availability and details.</p></div></section>
+  <section class="section"><div class="wrap split"><div><p class="eyebrow">Start a conversation</p><h2>Tell us what you need.</h2><p class="lead">Ask the MSD Autos team about rental availability and current details.</p><a class="btn" href={sitePath('/contact/?topic=rental')}>Make a rental enquiry <span class="arrow">→</span></a></div><div class="split__visual split__visual--rental" role="img" aria-label="Rental vehicle"></div></div></section>
+  <section class="section section--soft"><div class="wrap rental-request"><div><p class="eyebrow">Rental enquiry planner</p><h2>Share your dates and needs.</h2><p class="lead">Use this preview to organise the details for your enquiry. It does not reserve a vehicle or send information to MSD Autos.</p><div class="rental-confirmation"><strong>Availability and terms are confirmed directly by the team.</strong><span>Fleet, rates, deposit, insurance and booking process have not been confirmed in the supplied materials.</span></div></div><form class="rental-planner" id="rental-planner"><div class="form-grid"><div class="field"><label for="rental-start">Start date</label><input id="rental-start" type="date" required/></div><div class="field"><label for="rental-end">End date</label><input id="rental-end" type="date" required/></div><div class="field field--full"><label for="rental-type">Vehicle type you need</label><select id="rental-type" required><option value="" selected disabled>Choose a vehicle type</option><option value="city">City car</option><option value="family">Family car</option><option value="other">Other / not sure</option></select></div><div class="field field--full"><label for="rental-notes">Questions for the team</label><textarea id="rental-notes" placeholder="Price, availability, conditions…"></textarea></div></div><button class="btn" type="submit">Prepare enquiry <span class="arrow">→</span></button><p class="form-foot">Demo interaction only · nothing is sent or reserved.</p><div class="planner-result" id="planner-result" hidden role="status" aria-live="polite"></div></form></div></section>
+  <section class="section"><div class="wrap"><div class="section-head"><div><p class="eyebrow">What happens next</p><h2>A clear enquiry, with the details confirmed by the team.</h2></div><p>Proposed page flow for the demo. It does not describe a confirmed rental policy or booking commitment.</p></div><div class="grid grid--3 steps"><article class="step"><h3>Tell us your dates</h3><p class="muted">Share when you need a vehicle and for how long.</p></article><article class="step"><h3>Describe what you need</h3><p class="muted">Add your preferred vehicle type and any questions.</p></article><article class="step"><h3>Confirm availability</h3><p class="muted">Contact MSD Autos directly for current options and conditions.</p><a class="link" href="tel:+34604400244">Call MSD Autos ↗</a></article></div></div></section>
+</SiteLayout>
+<script>
+  const planner = document.querySelector<HTMLFormElement>('#rental-planner');
+  const result = document.querySelector<HTMLElement>('#planner-result');
+  const startField = document.querySelector<HTMLInputElement>('#rental-start');
+  const endField = document.querySelector<HTMLInputElement>('#rental-end');
+  const today = new Date();
+  const localToday = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  if (startField) startField.min = localToday;
+  startField?.addEventListener('change', () => { if (!endField) return; endField.min = startField.value || localToday; if (endField.value && endField.value < endField.min) endField.value = ''; });
+  planner?.addEventListener('submit', event => {
+    event.preventDefault();
+    const start = (document.querySelector<HTMLInputElement>('#rental-start')?.value ?? '').trim();
+    const end = (document.querySelector<HTMLInputElement>('#rental-end')?.value ?? '').trim();
+    if (start && end && end < start) { const messages = {en:'End date must be after the start date.',es:'La fecha de fin debe ser posterior a la fecha de inicio.',ru:'Дата окончания должна быть позже даты начала.'}; endField?.setCustomValidity(messages[document.documentElement.lang] ?? messages.en); endField?.reportValidity(); endField?.addEventListener('input', () => endField.setCustomValidity(''), { once: true }); return; }
+    const type = document.querySelector<HTMLSelectElement>('#rental-type')?.selectedOptions[0]?.textContent?.trim() ?? '';
+    const notes = document.querySelector<HTMLTextAreaElement>('#rental-notes')?.value.trim() ?? '';
+    if (result) {
+      result.replaceChildren(); result.hidden = false;
+      const language = document.documentElement.lang;
+      const messages = {en:{title:'Enquiry prepared',call:'Call MSD Autos ↗'},es:{title:'Consulta preparada',call:'Llama a MSD Autos ↗'},ru:{title:'Запрос подготовлен',call:'Позвоните в MSD Autos ↗'}};
+      const copy = messages[language] ?? messages.en;
+      const title = document.createElement('strong'); title.textContent = copy.title; result.append(title);
+      const dates = new Intl.DateTimeFormat(language, { dateStyle: 'medium' });
+      const dateRange = `${dates.format(new Date(`${start}T12:00:00`))} → ${dates.format(new Date(`${end}T12:00:00`))}`;
+      const summary = document.createElement('p'); summary.textContent = `${dateRange} · ${type}`; result.append(summary);
+      if (notes) { const note = document.createElement('p'); note.textContent = notes; result.append(note); }
+      const call = document.createElement('a'); call.className = 'btn btn--dark'; call.href = 'tel:+34604400244'; call.textContent = copy.call; result.append(call);
+      result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+</script>
+

@@ -1,0 +1,15 @@
+---
+import { sitePath } from '../utils/site-path';
+const { active = '', lang = 'en' } = Astro.props;
+import Icon from './Icon.astro';
+import BrandLockup from './BrandLockup.astro';
+const links = [{label:'Home',path:'/',href:sitePath('/')},{label:'Vehicles',path:'/cars/',href:sitePath('/cars/')},{label:'Rental',path:'/rental/',href:sitePath('/rental/')},{label:'Service',path:'/service/',href:sitePath('/service/')},{label:'Contact',path:'/contact/',href:sitePath('/contact/')}];
+---
+<header class="site-header"><div class="wrap nav"><BrandLockup eager /><button class="menu-toggle" aria-label="Open navigation" aria-controls="main-navigation" aria-expanded="false"><span class="menu-toggle__open"><Icon name="menu" size={25}/></span><span class="menu-toggle__close"><Icon name="close" size={25}/></span></button><nav class="nav__links" id="main-navigation" aria-label="Main navigation">{links.map(link=><a href={link.href} aria-current={active===link.path?'page':undefined}>{link.label}</a>)}<a class="btn nav__cta" href={sitePath('/cars/')}>Explore vehicles <span class="arrow">→</span></a><label class="language-switch"><span class="visually-hidden">Language</span><select aria-label="Language" id="language-select" value={lang}><option value="en">EN</option><option value="es">ES</option><option value="ru">RU</option></select></label></nav></div></header>
+<script>
+  const toggle = document.querySelector('.menu-toggle');
+  const nav = document.querySelector('.nav__links');
+  toggle?.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close navigation':'Open navigation');nav?.classList.toggle('is-open',open)});
+  document.addEventListener('keydown',(event)=>{if(event.key==='Escape'&&toggle?.getAttribute('aria-expanded')==='true'){toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Open navigation');nav?.classList.remove('is-open');toggle.focus()}});
+  nav?.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{toggle?.setAttribute('aria-expanded','false');toggle?.setAttribute('aria-label','Open navigation');nav.classList.remove('is-open')}));
+</script>

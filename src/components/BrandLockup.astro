@@ -1,0 +1,13 @@
+---
+import { sitePath } from '../utils/site-path';
+import { Image } from 'astro:assets';
+import brandSymbol from '../assets/msd-autos-symbol.png';
+const { eager = false } = Astro.props;
+---
+<a class="brand" href={sitePath('/')} aria-label="MSD Autos home">
+  <Image src={brandSymbol} alt="" width={48} height={48} loading={eager ? 'eager' : 'lazy'} />
+  <span class="brand__lockup">
+    <span class="brand__wordmark"><span>MSD</span><em>Autos</em></span>
+    <span class="brand__signature"><i aria-hidden="true"></i>Driven by confidence</span>
+  </span>
+</a>

@@ -1,0 +1,12 @@
+---
+import { sitePath } from '../utils/site-path';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import Icon from '../components/Icon.astro';
+import HoursStatus from '../components/HoursStatus.astro';
+---
+<SiteLayout title="Service | MSD Autos" description="Contact MSD Autos with an automotive service enquiry." active="/service/">
+  <section class="page-hero page-hero--dark page-hero--service"><div class="wrap"><p class="breadcrumbs"><a href={sitePath('/')}>Home</a> / Service</p><p class="eyebrow">MSD Autos service</p><h1>Service enquiries.</h1><p class="lead">Get in touch with MSD Autos to ask about automotive service.</p></div></section>
+  <section class="section"><div class="wrap"><div class="section-head"><div><p class="eyebrow">Automoción REACTOR · Workshop</p><h2>Automotive care in Torrevieja.</h2></div><p>The business dossier identifies the workshop’s active work as mechanics, maintenance, body repair and paint.</p></div><div class="service-offers"><article><span class="service-icon"><Icon name="wrench" size={22}/></span><h3>Mechanics & maintenance</h3><p>Ask the workshop whether it can take on your vehicle and what information it needs.</p></article><article><span class="service-icon"><Icon name="shield" size={22}/></span><h3>Body repair</h3><p>Contact the team to discuss the damage and confirm the next step.</p></article><article><span class="service-icon"><Icon name="car" size={22}/></span><h3>Paint</h3><p>Ask about the work required and request current details directly.</p></article></div></div></section>
+  <section class="section section--soft"><div class="wrap location-spotlight"><div><p class="eyebrow">Workshop location</p><h2>Automoción REACTOR</h2><p>C. Josefa Rebollo Rodriguez, 23 · 03183 Torrevieja, Alicante</p><HoursStatus/><a class="btn btn--dark" href="https://www.google.com/maps/search/?api=1&query=Automocion+Reactor+C.+Josefa+Rebollo+Rodriguez+23+03183+Torrevieja" target="_blank" rel="noopener noreferrer">Get directions <span class="arrow">↗</span></a></div><div class="phone-conflict"><strong>Call the workshop</strong><p>Public directories show two different numbers. Please verify the current number before travelling.</p><a href="tel:+34699000033">+34 699 00 00 33 <small>Current public listing</small></a><a href="tel:+34654392190">+34 654 39 21 90 <small>Other local listing</small></a></div></div></section>
+</SiteLayout>
+

@@ -1,0 +1,56 @@
+---
+import { sitePath } from '../utils/site-path';
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import BrandLockup from '../components/BrandLockup.astro';
+const { title = 'MSD Autos', description = 'Explore vehicles, rental and automotive service with MSD Autos.', active = '', minimal = false } = Astro.props;
+const lang = ['es','ru'].includes(Astro.url.searchParams.get('lang') || '') ? Astro.url.searchParams.get('lang') : 'en';
+---
+<!doctype html><html lang={lang}><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content={description}/><meta name="theme-color" content="#1f1f1f"/><link rel="icon" type="image/png" href={sitePath('/brand/favicon.png')}/><title>{title}</title></head><body class={minimal ? 'layout--minimal' : undefined}><a class="skip-link" href="#main-content">Skip to content</a>{minimal ? <header class="bio-header"><div class="bio-header__inner"><BrandLockup eager/><label class="language-switch"><span class="visually-hidden">Language</span><select aria-label="Language" id="language-select" value={lang}><option value="en">EN</option><option value="es">ES</option><option value="ru">RU</option></select></label></div></header> : <SiteHeader active={active} lang={lang}/>}<main id="main-content"><slot/></main>{!minimal && <SiteFooter/>}</body></html>
+<script>
+  import { translations } from '../i18n';
+  const allowed = ['en', 'es', 'ru'] as const;
+  type Lang = typeof allowed[number];
+  const params = new URLSearchParams(window.location.search);
+  const urlLanguage = params.get('lang');
+  const storedLanguage = localStorage.getItem('msd-autos-language');
+  const language: Lang = allowed.includes((urlLanguage || storedLanguage || 'en') as Lang) ? (urlLanguage || storedLanguage || 'en') as Lang : 'en';
+  localStorage.setItem('msd-autos-language', language);
+  document.documentElement.lang = language;
+  const selector = document.querySelector<HTMLSelectElement>('#language-select');
+  if (selector) selector.value = language;
+  const dictionary = language === 'en' ? {} : translations[language];
+  const replacements = Object.entries(dictionary).sort(([a], [b]) => b.length - a.length);
+  const matcher = replacements.length ? new RegExp(replacements.map(([source]) => source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g') : null;
+  const translate = (value: string) => matcher ? value.replace(matcher, (match) => dictionary[match] || match) : value;
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node: Node | null;
+  while ((node = walker.nextNode())) {
+    if (node.parentElement?.closest('script,style,noscript,[data-no-translate]')) continue;
+    if (node.nodeValue) node.nodeValue = translate(node.nodeValue);
+  }
+  document.querySelectorAll<HTMLElement>('[placeholder],[aria-label],[title],meta[name="description"]').forEach((element) => {
+    for (const attribute of ['placeholder', 'aria-label', 'title', 'content']) {
+      const value = element.getAttribute(attribute);
+      if (value) element.setAttribute(attribute, translate(value));
+    }
+  });
+  document.title = translate(document.title);
+  selector?.addEventListener('change', () => {
+    localStorage.setItem('msd-autos-language', selector.value);
+    const next = new URL(window.location.href);
+    if (selector.value === 'en') next.searchParams.delete('lang');
+    else next.searchParams.set('lang', selector.value);
+    window.location.assign(next);
+  });
+  document.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href]') : null;
+    if (!target || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const next = new URL(target.href, window.location.href);
+    if (next.origin !== window.location.origin) return;
+    if (language === 'en') next.searchParams.delete('lang');
+    else next.searchParams.set('lang', language);
+    target.href = next.toString();
+  });
+</script>

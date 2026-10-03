@@ -1,0 +1,5 @@
+---
+import Icon from './Icon.astro';
+const { icon = 'car', title, description, href, linkText = 'Learn more' } = Astro.props;
+---
+<article class="card service-card"><div class="service-icon"><Icon name={icon}/></div><h3>{title}</h3><p>{description}</p><a class="link" href={href}>{linkText} <span class="arrow" aria-hidden="true">→</span></a></article>

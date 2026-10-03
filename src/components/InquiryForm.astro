@@ -1,0 +1,8 @@
+---
+---
+<div class="form-card" id="message"><h2 style="font-size:28px">Send an enquiry</h2><form><div class="form-grid"><div class="field"><label for="name">Name</label><input id="name" name="name" autocomplete="name" placeholder="Your name" required/></div><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required/></div><div class="field field--full"><label for="topic">I’m interested in</label><select id="topic" name="topic"><option value="">Select a topic</option><option value="vehicles">Vehicles</option><option value="rental">Rental</option><option value="service">Service</option><option value="other">Other enquiry</option></select></div><div class="field field--full"><label for="message-text">Message</label><textarea id="message-text" name="message" placeholder="How can we help?" required></textarea></div></div><p class="form-foot">This form is a design preview and is not connected to an enquiry inbox yet.</p><button class="btn" type="button" disabled style="opacity:.55;cursor:not-allowed">Enquiry form coming soon</button></form></div>
+<script>
+  const selectedTopic = new URLSearchParams(window.location.search).get('topic');
+  const topicSelect = document.querySelector<HTMLSelectElement>('#topic');
+  if (topicSelect && ['vehicles', 'rental', 'service'].includes(selectedTopic ?? '')) topicSelect.value = selectedTopic!;
+</script>

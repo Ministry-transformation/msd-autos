@@ -1,0 +1,39 @@
+---
+import { sitePath } from '../../utils/site-path';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import VehicleCard from '../../components/VehicleCard.astro';
+import { vehicles } from '../../data/vehicles';
+---
+<SiteLayout title="Vehicles | MSD Autos" description="Explore vehicles and enquire about current availability with MSD Autos." active="/cars/">
+  <section class="page-hero page-hero--dark"><div class="wrap"><p class="breadcrumbs"><a href={sitePath('/')}>Home</a> / Vehicles</p><p class="eyebrow">MSD Autos · Vehicle sales</p><h1>Vehicles for sale.</h1><p class="lead">Ask us about current vehicle availability.</p></div></section>
+  <section class="section"><div class="wrap"><div class="section-head"><div><p class="eyebrow">6 vehicle listings · MSD Autos</p><h2>Find your next drive.</h2></div><p>Prices and specifications reflect the dealer listings checked 3 October 2026. Availability and prices can change; confirm directly before visiting.</p></div>
+  <div class="catalog-toolbar"><div class="catalog-toolbar__intro"><strong id="results-count" role="status" aria-live="polite" aria-atomic="true">6 vehicles</strong><span>MSD Autos listings · checked 3 October 2026</span></div><div class="catalog-controls"><label><span>Search model</span><input id="vehicle-search" type="search" placeholder="e.g. Toyota Auris"/></label><label><span>Fuel</span><select id="fuel-filter"><option value="all">All fuel types</option><option value="diesel">Diesel</option><option value="hybrid">Hybrid</option></select></label><label><span>Sort by</span><select id="vehicle-sort"><option value="featured">Featured</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></select></label><button class="catalog-reset" id="filters-reset" type="button">Reset</button></div></div>
+  <div class="vehicle-grid" id="vehicle-grid">{vehicles.map(vehicle => <VehicleCard vehicle={vehicle} />)}</div><p class="catalog-no-results" id="no-results" hidden>No vehicles match these filters. Try changing your search.</p><p class="catalog-source-note">Six featured listings from the MSD Autos dealer profile. Availability and prices can change; confirm on each original advert.</p><div class="catalog-all-stock"><div><p class="eyebrow">Complete sales inventory</p><h3>See every active MSD Autos advert.</h3><p>Open the dealer profile for the full vehicle selection and each original advert.</p></div><a class="btn" href="https://www.milanuncios.com/tiendas-profesionales/msd-autos-222741?utm_medium=social-media&utm_source=general&utm_campaign=send_friend-profile" target="_blank" rel="noopener noreferrer">View all cars for sale <span class="arrow">↗</span></a></div><a class="link catalog-secondary-link" href="https://www.coches.net/concesionario/msdautos/" target="_blank" rel="noopener noreferrer">Also on Coches.net ↗</a></div></section>
+  <section class="section section--soft"><div class="wrap split"><div><p class="eyebrow">Need more information?</p><h2>We can help with your enquiry.</h2><p class="lead">Ask about a vehicle you’re interested in.</p></div><div class="split__panel"><h3>Vehicle enquiry</h3><p>Contact MSD Autos to ask about current vehicle stock and details.</p><a class="btn btn--light" href={sitePath('/contact/?topic=vehicles')}>Contact MSD Autos <span class="arrow">→</span></a></div></div></section>
+</SiteLayout>
+<script>
+  const grid = document.querySelector<HTMLElement>('#vehicle-grid');
+  const search = document.querySelector<HTMLInputElement>('#vehicle-search');
+  const fuel = document.querySelector<HTMLSelectElement>('#fuel-filter');
+  const sort = document.querySelector<HTMLSelectElement>('#vehicle-sort');
+  const count = document.querySelector<HTMLElement>('#results-count');
+  const none = document.querySelector<HTMLElement>('#no-results');
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-vehicle-card]')];
+  const update = () => {
+    const term = search?.value.trim().toLowerCase() ?? '';
+    const type = fuel?.value ?? 'all';
+    const shown = cards.filter(card => {
+      const matches = (card.dataset.name ?? '').includes(term) && (type === 'all' || card.dataset.fuel === type);
+      card.hidden = !matches; return matches;
+    });
+    shown.sort((a,b) => sort?.value === 'price-asc' ? Number(a.dataset.price)-Number(b.dataset.price) : sort?.value === 'price-desc' ? Number(b.dataset.price)-Number(a.dataset.price) : cards.indexOf(a)-cards.indexOf(b));
+    shown.forEach(card => grid?.append(card));
+    const language = document.documentElement.lang;
+    const nouns = language === 'es' ? ['vehículo','vehículos'] : language === 'ru' ? ['автомобиль','автомобиля','автомобилей'] : ['vehicle','vehicles'];
+    const noun = language === 'ru' ? (shown.length % 10 === 1 && shown.length % 100 !== 11 ? nouns[0] : shown.length % 10 >= 2 && shown.length % 10 <= 4 && !(shown.length % 100 >= 12 && shown.length % 100 <= 14) ? nouns[1] : nouns[2]) : (shown.length === 1 ? nouns[0] : nouns[1]);
+    if (count) count.textContent = `${shown.length} ${noun}`;
+    if (none) none.hidden = shown.length > 0;
+  };
+  search?.addEventListener('input', update); fuel?.addEventListener('change', update); sort?.addEventListener('change', update);
+  document.querySelector('#filters-reset')?.addEventListener('click', () => { if(search) search.value=''; if(fuel) fuel.value='all'; if(sort) sort.value='featured'; update(); search?.focus(); });
+</script>

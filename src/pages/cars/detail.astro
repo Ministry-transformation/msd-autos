@@ -1,0 +1,53 @@
+---
+import { sitePath } from '../../utils/site-path';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { vehicles } from '../../data/vehicles';
+import { translations } from '../../i18n';
+const vehicleData = JSON.stringify(vehicles);
+const translationData = JSON.stringify(translations);
+const basePath = import.meta.env.BASE_URL;
+---
+<SiteLayout title="Vehicle details | MSD Autos" description="Explore a vehicle listing and ask MSD Autos about current availability." active="/cars/">
+  <section class="page-hero page-hero--dark"><div class="wrap"><p class="breadcrumbs"><a href={sitePath('/')}>Home</a> / <a href={sitePath('/cars/')}>Vehicles</a> / Vehicle details</p><p class="eyebrow">MSD Autos · Vehicle sales</p><h1 id="detail-title">Vehicle details.</h1><p class="lead" id="detail-intro">Review the listing information and confirm current availability directly with MSD Autos.</p></div></section>
+  <section class="section"><div class="wrap">
+    <div class="detail-layout" id="vehicle-detail" hidden>
+      <div><figure class="detail-photo"><img id="detail-image" src="" alt=""/><figcaption>Dealer listing photo · confirm current availability on the original advert</figcaption></figure>
+        <div class="detail-copy"><p class="eyebrow">At a glance</p><h2 id="detail-name"></h2><p class="muted">Specifications shown here are transcribed from the MSD Autos advert snapshot. The original advert is the reference for current details.</p>
+        <div class="detail-facts" id="detail-facts"></div><div class="detail-disclosure"><strong>Before you visit</strong><p>Availability and advertised price can change. Call MSD Autos to confirm the vehicle is still available and arrange the next step.</p></div></div>
+      </div>
+      <aside class="detail-panel"><p class="eyebrow">Advert snapshot</p><p class="detail-price" id="detail-price"></p><p class="muted">Listing checked 3 October 2026. Verify current price and availability in the original advert.</p><ul class="spec-list" id="detail-specs"></ul><a class="btn" id="detail-listing" href={sitePath('/cars/')} target="_blank" rel="noopener noreferrer">Open original listing <span class="arrow">↗</span></a><a class="btn btn--outline detail-contact" id="detail-enquire" href={sitePath('/contact/?topic=vehicles')}>Ask MSD Autos <span class="arrow">→</span></a><p class="form-foot">Dealer listing states one-year warranty and VAT included. Confirm terms in the live advert.</p></aside>
+    </div>
+    <div class="detail-empty" id="detail-empty"><span class="service-icon"><span aria-hidden="true">⌕</span></span><p class="eyebrow">Choose from the catalogue</p><h2>Pick a vehicle to see its details.</h2><p class="muted">Each car page brings together the advert snapshot, key specifications and direct enquiry links.</p><a class="btn" href={sitePath('/cars/')}>Browse vehicles <span class="arrow">→</span></a></div>
+  </div></section>
+  <section class="section section--soft"><div class="wrap detail-next"><div><p class="eyebrow">Need a hand?</p><h2>Ask the team about this vehicle.</h2><p>Call MSD Autos and mention the model, or review the original advert for its current details.</p></div><a class="btn btn--dark" href="tel:+34604400244">Call +34 604 40 02 44 <span class="arrow">↗</span></a></div></section>
+</SiteLayout>
+<script define:vars={{ vehicleData, translationData, basePath }}>
+  const inventory = JSON.parse(vehicleData);
+  const allTranslations = JSON.parse(translationData);
+  const dictionary = allTranslations[document.documentElement.lang] ?? {};
+  const translate = (value) => dictionary[value] ?? value;
+  const id = new URLSearchParams(location.search).get('vehicle');
+  const car = inventory.find(item => item.id === id);
+  const detail = document.querySelector('#vehicle-detail');
+  const empty = document.querySelector('#detail-empty');
+  if (car && detail && empty) {
+    empty.hidden = true; detail.hidden = false;
+    const put = (selector, value) => { const node = document.querySelector(selector); if (node) node.textContent = value; };
+    put('#detail-title', car.name); put('#detail-intro', translate('Vehicle listing snapshot · MSD Autos')); put('#detail-name', car.name); put('#detail-price', car.price);
+    const photo = document.querySelector('#detail-image'); if (photo) { photo.src = car.image; photo.alt = car.imageAlt; }
+    const localValue = (value) => value === car.fuel ? translate(value) : value;
+    const facts = document.querySelector('#detail-facts');
+    const details = [[car.year,'Year'],[car.fuel,'Fuel'],[car.mileage,'Mileage'],[car.power,'Power']];
+    if (facts) {
+      facts.replaceChildren();
+      details.forEach(([value,label]) => { const item = document.createElement('div'); const term = document.createElement('span'); const description = document.createElement('strong'); term.textContent = translate(label); description.textContent = localValue(value); item.append(term, description); facts.append(item); });
+    }
+    const specs = document.querySelector('#detail-specs');
+    if (specs) {
+      specs.replaceChildren();
+      details.forEach(([value,label]) => { const item = document.createElement('li'); const term = document.createElement('span'); const description = document.createElement('strong'); term.textContent = translate(label); description.textContent = localValue(value); item.append(term, description); specs.append(item); });
+    }
+    const listing = document.querySelector('#detail-listing'); if (listing) listing.href = car.listing;
+    const enquire = document.querySelector('#detail-enquire'); if (enquire) enquire.href = `${basePath}contact/?topic=vehicles&vehicle=${encodeURIComponent(car.name)}`;
+  }
+</script>

@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+SITE_REVIEW_AND_NEXT_STEPS.md

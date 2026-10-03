@@ -1,0 +1,24 @@
+---
+import type { Vehicle } from '../data/vehicles';
+import { sitePath } from '../utils/site-path';
+const { vehicle } = Astro.props as { vehicle: Vehicle };
+const enquiry = sitePath(`/contact/?topic=vehicles&vehicle=${encodeURIComponent(vehicle.name)}`);
+const details = sitePath(`/cars/detail/?vehicle=${encodeURIComponent(vehicle.id)}`);
+---
+<article class="vehicle-card" data-vehicle-card data-fuel={vehicle.fuel.toLowerCase()} data-price={Number(vehicle.price.replace(/[^0-9]/g, ''))} data-name={vehicle.name.toLowerCase()}>
+  <a class="vehicle-card__image" href={vehicle.listing} target="_blank" rel="noopener noreferrer" aria-label="Open original dealer listing">
+    <img src={vehicle.image} alt={vehicle.imageAlt} loading="lazy" width="252" height="189" />
+    <span class="vehicle-card__tag">{vehicle.tag}</span>
+  </a>
+  <div class="vehicle-card__body">
+    <div class="vehicle-card__heading"><h3 data-no-translate>{vehicle.name}</h3><strong>{vehicle.price}</strong></div>
+    <ul class="vehicle-card__specs" aria-label="Vehicle specifications">
+      <li><span>{vehicle.year}</span><span>{vehicle.fuel}</span><span>{vehicle.mileage}</span><span>{vehicle.power}</span></li>
+    </ul>
+    <p class="vehicle-card__note">1-year warranty · VAT included</p>
+    <div class="vehicle-card__actions">
+      <a class="btn" href={details}>View car details <span class="arrow">→</span></a>
+      <a class="link" href={enquiry}>Ask about this car</a>
+    </div>
+  </div>
+</article>

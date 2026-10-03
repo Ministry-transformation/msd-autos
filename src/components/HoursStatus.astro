@@ -1,0 +1,8 @@
+---
+import Icon from './Icon.astro';
+const { label = 'Opening hours', status = 'To be confirmed with the team' } = Astro.props;
+---
+<div class="hours-status">
+  <Icon name="calendar" size={18} />
+  <div><span>{label}</span><strong>{status}</strong></div>
+</div>
